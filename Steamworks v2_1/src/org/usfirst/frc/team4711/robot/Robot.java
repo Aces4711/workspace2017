@@ -3,6 +3,7 @@ package org.usfirst.frc.team4711.robot;
 import org.usfirst.frc.team4711.robot.config.IOMap;
 import org.usfirst.frc.team4711.robot.subsystems.BallIntake;
 import org.usfirst.frc.team4711.robot.subsystems.BallLauncher;
+import org.usfirst.frc.team4711.robot.subsystems.DistanceSubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.ISubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.RopeClimber;
@@ -18,6 +19,7 @@ public class Robot {
 	private ISubsystem ballIntake;
 	private ISubsystem ballLauncher;
 	private ISubsystem robotDrive;
+	private ISubsystem distanceFinder;
 	
     public void robotInit() {
     	System.out.println("on robotInit");
@@ -29,6 +31,7 @@ public class Robot {
     	this.ballIntake = new BallIntake();
     	this.ballLauncher = new BallLauncher();
     	this.robotDrive = new DriveSubsystem();
+    	this.distanceFinder = new DistanceSubsystem();
     	
     }
     
@@ -38,5 +41,9 @@ public class Robot {
     	this.ropeClimber.teleopPeriodic();
     	this.ballIntake.teleopPeriodic();
     	this.ballLauncher.teleopPeriodic();
+    	
+    	this.distanceFinder.teleopPeriodic();
+    	
+    	System.out.println(((DistanceSubsystem) this.distanceFinder).getRange());
     }
 }

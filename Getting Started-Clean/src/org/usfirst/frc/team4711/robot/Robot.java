@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4711.robot;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -20,6 +21,8 @@ import com.ctre.CANTalon;
 public class Robot extends IterativeRobot {
 
 	private RobotDrive _robotDrive;
+	
+	AnalogInput rangeFinderA;
 	
 	private Gyro _gyro;
 	private long _autonomousStartTime;
@@ -43,6 +46,9 @@ public class Robot extends IterativeRobot {
     	_robotDrive = new RobotDrive( new CANTalon(RobotMapping.FRONTLEFTMOTOR_CHANNEL), new CANTalon(RobotMapping.REARLEFTMOTOR_CHANNEL),
     								  new CANTalon(RobotMapping.FRONTRIGHTMOTOR_CHANNEL), new CANTalon(RobotMapping.REARRIGHTMOTOR_CHANNEL));
     	
+		this.rangeFinderA = new AnalogInput(0);
+		this.rangeFinderA.setOversampleBits(4);
+		this.rangeFinderA.setAverageBits(2);
     }
     
     /**
@@ -98,8 +104,11 @@ public class Robot extends IterativeRobot {
     	_robotDrive.arcadeDrive(_joystick);
     	
     	//test encoder
-    	System.out.println("Left.EncPosition : " + _rearLeftTalon.getEncPosition() + ", Left.EncVelocity : " + _rearLeftTalon.getEncVelocity());
+    	/**System.out.println("Left.EncPosition : " + _rearLeftTalon.getEncPosition() + ", Left.EncVelocity : " + _rearLeftTalon.getEncVelocity());
     	System.out.println("Right.EncPosition : " + _rearRightTalon.getEncPosition() + ", Right.EncVelocity : " + _rearRightTalon.getEncVelocity());
+    	**/
+    	
+    	System.out.println(this.rangeFinderA.getVoltage());
     	
     	Timer.delay(0.01);
     }
