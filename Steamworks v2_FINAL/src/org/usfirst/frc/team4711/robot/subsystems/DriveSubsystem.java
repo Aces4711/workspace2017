@@ -2,19 +2,14 @@ package org.usfirst.frc.team4711.robot.subsystems;
 
 import org.usfirst.frc.team4711.robot.commands.DriveWithJoystick;
 import org.usfirst.frc.team4711.robot.config.IOMap;
-import org.usfirst.frc.team4711.robot.wrappers.ADXRS453Gyro;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
-import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 
 public class DriveSubsystem extends PIDSubsystem {
 	public static enum State {
@@ -25,12 +20,12 @@ public class DriveSubsystem extends PIDSubsystem {
 	private CANTalon frontLeft;
 	private CANTalon frontRight;
 	
-	private CANTalon backLeft;
-	private CANTalon backRight;
+	private CANTalon backLeftWithEncoder;
+	private CANTalon backRightWithEncoder;
 	
 	private RobotDrive wheels;
 
-	private AnalogGyro gyroscope;
+	private AnalogGyro gyro;
 	
 	private AnalogInput frontDistanceSensor;
 	private AnalogInput backDistanceSensor;
@@ -38,7 +33,7 @@ public class DriveSubsystem extends PIDSubsystem {
 	private static DriveSubsystem instance;
 	
 	private DriveSubsystem() {
-		super("driveSubsystem", .5, .001, .0);
+		super("driveSubsystem", .0, .0, .0);
 		
 		frontLeft = new CANTalon(IOMap.FRONT_LEFT_MOTOR_CHANNEL);
 		frontRight = new CANTalon(IOMap.FRONT_RIGHT_MOTOR_CHANNEL);
@@ -50,36 +45,27 @@ public class DriveSubsystem extends PIDSubsystem {
 		 * 
 		 * Default pulsesPerRotation = 1024
 		 */
-		backLeft = new CANTalon(IOMap.REAR_LEFT_MOTOR_CHANNEL);
+		backLeftWithEncoder = new CANTalon(IOMap.REAR_LEFT_MOTOR_CHANNEL);
 		//When measuring position, best to sample Pulse Width at rest and set the position of the quadrature signal to match it
-		backLeft.setEncPosition(backLeft.getPulseWidthPosition() & 0xFFF);
+		backLeftWithEncoder.setEncPosition(backLeftWithEncoder.getPulseWidthPosition() & 0xFFF);
+		backLeftWithEncoder.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+
 		
-		backLeft.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		//backLeft.configEncoderCodesPerRev(4);
-		//set the peak and Nominal outputs, 12V mean full
-		backLeft.configNominalOutputVoltage(+0f, -0f);
-		backLeft.configPeakOutputVoltage(+12f, -12f);
-		//0 to 6 in 1 sec
-		backLeft.setVoltageRampRate(6);
+		backRightWithEncoder = new CANTalon(IOMap.REAR_RIGHT_MOTOR_CHANNEL);
+		backRightWithEncoder.setEncPosition(backRightWithEncoder.getPulseWidthPosition() & 0xFFF);
+		backRightWithEncoder.setFeedbackDevice(FeedbackDevice.QuadEncoder);
 		
-		backRight = new CANTalon(IOMap.REAR_RIGHT_MOTOR_CHANNEL);
-		backRight.setEncPosition(backRight.getPulseWidthPosition() & 0xFFF);
-		backRight.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-		backRight.configNominalOutputVoltage(+0f, -0f);
-		backRight.configPeakOutputVoltage(+12f, -12f);
-		backRight.setVoltageRampRate(6);
-		
-		wheels = new RobotDrive(frontLeft, backLeft, frontRight, backRight);
+		wheels = new RobotDrive(frontLeft, backLeftWithEncoder, frontRight, backRightWithEncoder);
 		
 		try {
 			/*
 			 * ADXRS450 Gyro is an Analog Device
 			 * +-300mV/sec
 			 */
-			gyroscope = new AnalogGyro(IOMap.GYRO_CHANNEL);
-			gyroscope.setSensitivity(.3);
+			gyro = new AnalogGyro(IOMap.GYRO_CHANNEL);
+			gyro.setSensitivity(.3);
 		} catch (Exception e) {
-			System.out.println("No gyroscrope found rotation will be based on position");
+			System.out.println("No gyroscrope found, rotation will be based on position");
 		}
 		
 		frontDistanceSensor = new AnalogInput(0);
@@ -98,16 +84,16 @@ public class DriveSubsystem extends PIDSubsystem {
 	
 	@Override
 	protected void initDefaultCommand() {
-		this.setDefaultCommand(new DriveWithJoystick());
+		setDefaultCommand(new DriveWithJoystick());
 	}
 	
 	@Override
 	protected double returnPIDInput() {
 		switch(state){
 		case AUTO_STRAIGHT:
-			return Math.min(-backLeft.getEncPosition(), backRight.getEncPosition());
+			return Math.min(-backLeftWithEncoder.getEncPosition(), backRightWithEncoder.getEncPosition());
 		case AUTO_TURN:
-			return gyroscope.getAngle();
+			return gyro.getAngle();
 		default:
 			break;
 		}
@@ -123,7 +109,7 @@ public class DriveSubsystem extends PIDSubsystem {
 			//arcadeDrive(output, -gyroscope.getAngle() * .03);
 			break;
 		case AUTO_TURN:
-			wheels.tankDrive(output, -output);
+			wheels.tankDrive(-output, output);
 			break;
 		default:
 			break;
@@ -164,10 +150,10 @@ public class DriveSubsystem extends PIDSubsystem {
 	public void setState(State state) {
 		switch(state){
 		case AUTO_STRAIGHT:
-			getPIDController().setPID(.5, .001, .0);
+			getPIDController().setPID(IOMap.DRIVE_DISTANCE_PID[0], IOMap.DRIVE_DISTANCE_PID[1], IOMap.DRIVE_DISTANCE_PID[2]);
 			break;
 		case AUTO_TURN:
-			getPIDController().setPID(.5, .001, .0);
+			getPIDController().setPID(IOMap.DRIVE_ANGLE_PID[0], IOMap.DRIVE_ANGLE_PID[1], IOMap.DRIVE_ANGLE_PID[2]);
 			break;
 		default:
 			break;

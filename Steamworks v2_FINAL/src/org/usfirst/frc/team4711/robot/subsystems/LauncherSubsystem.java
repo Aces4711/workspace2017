@@ -7,7 +7,6 @@ import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 public class LauncherSubsystem extends Subsystem {
@@ -17,19 +16,20 @@ public class LauncherSubsystem extends Subsystem {
 	
 	private static LauncherSubsystem instance;
 	
-	public LauncherSubsystem() {
+	private LauncherSubsystem() {
 		super("launcherSubsystem");
 		
 		augger = new CANTalon(IOMap.BALL_AUGGER);
 		augger.configNominalOutputVoltage(0.0, 0.0);
 		augger.configPeakOutputVoltage(12.0 * MotorSpeeds.AUGGER_SPEED, -12.0 * MotorSpeeds.AUGGER_SPEED);
-		augger.setVoltageRampRate(6);
+		augger.setVoltageRampRate(12.0 * MotorSpeeds.AUGGER_SPEED);
 				
 		launcherWithEncoder = new CANTalon(IOMap.BALL_LAUNCH_CHANNEL);
 		launcherWithEncoder.setEncPosition(launcherWithEncoder.getPulseWidthPosition() & 0xFFF);
 		launcherWithEncoder.setFeedbackDevice(FeedbackDevice.PulseWidth);
 		launcherWithEncoder.setPID(IOMap.LAUNCHER_SPEED_PID[0], IOMap.LAUNCHER_SPEED_PID[1], IOMap.LAUNCHER_SPEED_PID[2]);
 		launcherWithEncoder.setVoltageRampRate(12.0);
+		launcherWithEncoder.setInverted(true);
 	}
 	
 	@Override

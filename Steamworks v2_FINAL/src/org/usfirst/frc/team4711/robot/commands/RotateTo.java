@@ -39,6 +39,7 @@ public class RotateTo extends Command {
 	@Override
     protected void end() {
         driveSubsystem.disable();
+        driveSubsystem.stop();
     }
 	
 	@Override

@@ -8,7 +8,4 @@ public class KeyMap {
 	public static final int CONTINUOUS_LAUNCH = IOMap.TRIGGER_LT;
 	public static final int SINGLE_LAUNCH = IOMap.TRIGGER_RT;
 	public static final int AIM = IOMap.BACK;
-	
-	public static final double HELD_PRESS = 0.2;
-	public static final double SINGLE_LAUNCH_TIME = 1.0;
 }

@@ -11,14 +11,14 @@ public class RunIntake extends Command {
 	private double motorSpeed;
 	
 	public RunIntake(double motorSpeed) {
-		super("aquireBalls");
+		super("runIntake");
 		this.motorSpeed = motorSpeed;
 		
 		pickupSubsystem = PickupSubsystem.getInstance();
 		requires(pickupSubsystem);
 		
-		if(motorSpeed <= 0)
-			setTimeout(1);
+		//safe guard to run for the longest 30 sec
+		setTimeout((motorSpeed <= 0) ? 1 : 30);	
 	}
 	
 	@Override
@@ -28,7 +28,7 @@ public class RunIntake extends Command {
 	
 	@Override
 	protected boolean isFinished() {
-		return (motorSpeed > 0) ? false : isTimedOut();
+		return isTimedOut();
 	}
 	
 	@Override

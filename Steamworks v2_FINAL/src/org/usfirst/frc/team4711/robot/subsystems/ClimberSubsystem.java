@@ -17,10 +17,8 @@ public class ClimberSubsystem extends Subsystem {
 		super("climberSubsystem");
 		
 		climber = new CANTalon(IOMap.LEFT_CLIMB_CHANNEL);
-		//set the peak and Nominal outputs, 12V mean full
 		climber.configNominalOutputVoltage(0.0, 0.0);
 		climber.configPeakOutputVoltage(12.0 * MotorSpeeds.CLIMB_SPEED, -12.0 * MotorSpeeds.CLIMB_SPEED);
-		//0 to 6 in 1 sec
 		climber.setVoltageRampRate(6);
 	}
 	

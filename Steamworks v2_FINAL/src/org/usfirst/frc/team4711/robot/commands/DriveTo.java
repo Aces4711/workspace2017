@@ -39,6 +39,7 @@ public class DriveTo extends Command {
 	@Override
     protected void end() {
         driveSubsystem.disable();
+        driveSubsystem.stop();
     }
 	
 	@Override

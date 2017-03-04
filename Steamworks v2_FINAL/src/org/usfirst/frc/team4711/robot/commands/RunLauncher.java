@@ -5,12 +5,12 @@ import org.usfirst.frc.team4711.robot.subsystems.LauncherSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
 
-public class Launch extends Command {
+public class RunLauncher extends Command {
 
 	private LauncherSubsystem launchSubsystem;
 	
-	public Launch() {
-		super("launch");
+	public RunLauncher() {
+		super("runLaunch");
 		
 		launchSubsystem = LauncherSubsystem.getInstance();
 		requires(launchSubsystem);

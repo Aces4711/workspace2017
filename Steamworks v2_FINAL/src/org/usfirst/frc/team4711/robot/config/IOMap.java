@@ -1,6 +1,11 @@
 package org.usfirst.frc.team4711.robot.config;
 
 public class IOMap {
+	// PIDs - needs turning!!!
+	public static final double[] DRIVE_DISTANCE_PID = {.5, .001, .0};
+	public static final double[] DRIVE_ANGLE_PID = {.5, .001, .0};
+	public static final double[] LAUNCHER_SPEED_PID = {.5, .001, .0};
+	
 	// drive
 	/*
 	public static final int FRONT_LEFT_MOTOR_CHANNEL = 0;
@@ -59,7 +64,8 @@ public class IOMap {
 	public static final int AXIS_TRIGGER_LEFT = 5;
 	public static final int AXIS_TRIGGER_RIGHT = 6;
 	
-	public static final double backSpace = 1.0;
-	public static final double frontSpace = 1.0;
+	//robot eye
+	public static final int CAMERA_IMG_WIDTH = 650;
+	public static final int CAMERA_IMG_HEIGHT = 480;
 }
 
