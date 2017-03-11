@@ -30,13 +30,13 @@ public class ControllerSubsystem extends Subsystem {
 		intakeUnjamButton.whenPressed(new RunIntake(-1.0));
 		
 		winchUpButton = new JoystickButton(joystick, KeyMap.WINCH_UP);
-		winchUpButton.whileHeld(new RunClimber(1.0));
+		winchUpButton.toggleWhenPressed(new RunClimber(1.0));
 
 		winchDownButton = new JoystickButton(joystick, KeyMap.WINCH_DOWN);
-		winchDownButton.whileHeld(new RunClimber(-1.0));
+		winchDownButton.toggleWhenPressed(new RunClimber(-1.0));
 		
 		continuousLaunchButton = new JoystickButton(joystick, KeyMap.CONTINUOUS_LAUNCH);
-		continuousLaunchButton.whileHeld(new RunLauncher());
+		continuousLaunchButton.toggleWhenPressed(new RunLauncher());
 	}
 	
 	@Override

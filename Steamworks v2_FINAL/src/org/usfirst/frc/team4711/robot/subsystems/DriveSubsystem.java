@@ -2,6 +2,7 @@ package org.usfirst.frc.team4711.robot.subsystems;
 
 import org.usfirst.frc.team4711.robot.commands.DriveWithJoystick;
 import org.usfirst.frc.team4711.robot.config.IOMap;
+import org.usfirst.frc.team4711.robot.wrappers.CustomDrive;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
@@ -23,7 +24,7 @@ public class DriveSubsystem extends PIDSubsystem {
 	private CANTalon backLeftWithEncoder;
 	private CANTalon backRightWithEncoder;
 	
-	private RobotDrive wheels;
+	private CustomDrive wheels;
 
 	private AnalogGyro gyro;
 	
@@ -46,16 +47,16 @@ public class DriveSubsystem extends PIDSubsystem {
 		 * Default pulsesPerRotation = 1024
 		 */
 		backLeftWithEncoder = new CANTalon(IOMap.REAR_LEFT_MOTOR_CHANNEL);
-		//When measuring position, best to sample Pulse Width at rest and set the position of the quadrature signal to match it
-		backLeftWithEncoder.setEncPosition(backLeftWithEncoder.getPulseWidthPosition() & 0xFFF);
+	    backLeftWithEncoder.setEncPosition(backLeftWithEncoder.getPulseWidthPosition() & 0xFFF);
 		backLeftWithEncoder.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-
+		backLeftWithEncoder.configEncoderCodesPerRev(1024);
 		
 		backRightWithEncoder = new CANTalon(IOMap.REAR_RIGHT_MOTOR_CHANNEL);
 		backRightWithEncoder.setEncPosition(backRightWithEncoder.getPulseWidthPosition() & 0xFFF);
 		backRightWithEncoder.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+		backRightWithEncoder.configEncoderCodesPerRev(1024);
 		
-		wheels = new RobotDrive(frontLeft, backLeftWithEncoder, frontRight, backRightWithEncoder);
+		wheels = new CustomDrive(frontLeft, backLeftWithEncoder, frontRight, backRightWithEncoder);
 		
 		try {
 			/*
@@ -68,11 +69,19 @@ public class DriveSubsystem extends PIDSubsystem {
 			System.out.println("No gyroscrope found, rotation will be based on position");
 		}
 		
-		frontDistanceSensor = new AnalogInput(0);
-		backDistanceSensor = new AnalogInput(1);
+		//frontDistanceSensor = new AnalogInput(0);
+		//backDistanceSensor = new AnalogInput(1);
 
         setAbsoluteTolerance(10);
 		setState(State.TELEOP);
+		
+		frontDistanceSensor = new AnalogInput(IOMap.FRONT_SENSOR);
+		frontDistanceSensor.setOversampleBits(4);
+		frontDistanceSensor.setAverageBits(2);
+		
+		backDistanceSensor = new AnalogInput(IOMap.BACK_SENSOR);
+		backDistanceSensor.setOversampleBits(4);
+		backDistanceSensor.setAverageBits(2);
 	}
 	
 	public static DriveSubsystem getInstance(){
@@ -91,7 +100,7 @@ public class DriveSubsystem extends PIDSubsystem {
 	protected double returnPIDInput() {
 		switch(state){
 		case AUTO_STRAIGHT:
-			return Math.min(-backLeftWithEncoder.getEncPosition(), backRightWithEncoder.getEncPosition());
+			return Math.min(-backLeftWithEncoder.getPosition(), backRightWithEncoder.getPosition());
 		case AUTO_TURN:
 			return gyro.getAngle();
 		default:
@@ -116,11 +125,11 @@ public class DriveSubsystem extends PIDSubsystem {
 		}
 	}
 	
-	public int getFrontDistance() {
+	public double getFrontDistance() {
 		return frontDistanceSensor.getValue();
 	}
 	
-	public int getBackDistance() {
+	public double getBackDistance() {
 		return backDistanceSensor.getValue();
 	}
 	
@@ -131,7 +140,7 @@ public class DriveSubsystem extends PIDSubsystem {
 	public void setMoveBy(double distanceInches){
 		setState(DriveSubsystem.State.AUTO_STRAIGHT);
 		double wheelCircumference = Math.PI * IOMap.DRIVE_WHEEL_DIAMETER;
-		setSetpointRelative((distanceInches / wheelCircumference) * 1024);
+		setSetpointRelative(distanceInches / wheelCircumference);
 	}
 	
 	public void setRotateBy(double angle){

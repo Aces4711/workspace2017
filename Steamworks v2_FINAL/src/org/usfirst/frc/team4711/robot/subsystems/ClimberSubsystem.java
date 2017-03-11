@@ -17,9 +17,6 @@ public class ClimberSubsystem extends Subsystem {
 		super("climberSubsystem");
 		
 		climber = new CANTalon(IOMap.LEFT_CLIMB_CHANNEL);
-		climber.configNominalOutputVoltage(0.0, 0.0);
-		climber.configPeakOutputVoltage(12.0 * MotorSpeeds.CLIMB_SPEED, -12.0 * MotorSpeeds.CLIMB_SPEED);
-		climber.setVoltageRampRate(6);
 	}
 	
 	@Override
@@ -34,6 +31,6 @@ public class ClimberSubsystem extends Subsystem {
 	}
 	
 	public void setMotorSpeed(double moveValue){
-		climber.set(moveValue);
+		climber.set(moveValue * MotorSpeeds.CLIMB_SPEED);
 	}
 }

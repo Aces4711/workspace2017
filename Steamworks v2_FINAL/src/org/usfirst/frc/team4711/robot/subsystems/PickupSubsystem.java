@@ -17,11 +17,6 @@ public class PickupSubsystem extends Subsystem {
 		super("pickupSubsystem");
 		
 		pickup = new CANTalon(IOMap.BALL_INTAKE_CHANNEL);
-		//set the peak and Nominal outputs, 12V mean full
-		pickup.configNominalOutputVoltage(0.0, 0.0);
-		pickup.configPeakOutputVoltage(12.0 * MotorSpeeds.INTAKE_SPEED, -12.0 * MotorSpeeds.INTAKE_SPEED);
-		//0 to 6 in 1 sec
-		pickup.setVoltageRampRate(6);
 	}
 	
 	@Override
@@ -36,6 +31,6 @@ public class PickupSubsystem extends Subsystem {
 	}
 	
 	public void setMotorSpeed(double moveValue){
-		pickup.set(moveValue);
+		pickup.set(moveValue * MotorSpeeds.INTAKE_SPEED);
 	}
 }

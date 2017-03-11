@@ -1,10 +1,11 @@
 package org.usfirst.frc.team4711.robot.config;
 
 public class IOMap {
-	// PIDs - needs turning!!!
-	public static final double[] DRIVE_DISTANCE_PID = {.5, .001, .0};
+	// PIDs - needs tuning!!!
+	public static final double[] DRIVE_DISTANCE_PID = {.01, .001, .0};
 	public static final double[] DRIVE_ANGLE_PID = {.5, .001, .0};
-	public static final double[] LAUNCHER_SPEED_PID = {.5, .001, .0};
+	// tun'd
+	public static final double[] LAUNCHER_SPEED_PID = {.425, .001, .001, .065};//p i d f
 	
 	// drive
 	/*
@@ -38,10 +39,15 @@ public class IOMap {
 	// ball handling
 	public static final int BALL_INTAKE_CHANNEL = 6;
 	public static final int BALL_AUGGER = 7;
-	public static final int BALL_LAUNCH_CHANNEL = 8;
+	//public static final int BALL_LAUNCH_CHANNEL = 8;
+	public static final int BALL_LAUNCH_CHANNEL = 3;
 	
 	// wacky stuff
 	public static final int JOYSTICK_PORT = 0;
+	
+	public static final int FRONT_SENSOR = 0;
+	
+	public static final int BACK_SENSOR = 1;
 	
 	public static final int AUTONOMOUS_DURATION = 15; // in seconds
 	

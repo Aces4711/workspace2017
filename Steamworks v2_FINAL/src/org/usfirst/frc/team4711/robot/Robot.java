@@ -2,6 +2,8 @@ package org.usfirst.frc.team4711.robot;
 
 import org.usfirst.frc.team4711.robot.commands.DriveWithJoystick;
 import org.usfirst.frc.team4711.robot.commands.DropNShoot;
+import org.usfirst.frc.team4711.robot.commands.RunLauncher;
+import org.usfirst.frc.team4711.robot.commands.RunTest;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.command.Command;
@@ -13,14 +15,15 @@ public class Robot extends IterativeRobot {
 	
 	public void robotInit() {
 		autonomousCommand = new DropNShoot();
-		teleopCommand = new DriveWithJoystick();
+		//teleopCommand = new DriveWithJoystick();
+		teleopCommand = new RunLauncher();
 	}
 	
 	public void teleopInit() {
 		if(autonomousCommand != null) 
 			autonomousCommand.cancel();
 		
-		if(teleopCommand != null) 
+		if(teleopCommand != null)
 			teleopCommand.start();
 	}
 	
