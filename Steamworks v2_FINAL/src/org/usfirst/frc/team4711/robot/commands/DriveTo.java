@@ -26,6 +26,8 @@ public class DriveTo extends Command {
 		
 		driveSubsystem = DriveSubsystem.getInstance();
 		requires(driveSubsystem);
+
+		setTimeout(30);	
 	}
 	
 	@Override
@@ -37,28 +39,31 @@ public class DriveTo extends Command {
 	
 	@Override
 	protected void execute() {
-		if(sensorVoltages.size() < 100)
-			sensorVoltages.add((isForward) ? driveSubsystem.getFrontSensorVoltage() : driveSubsystem.getBackSensorVoltage());
-		else {
+		sensorVoltages.add((isForward) ? driveSubsystem.getFrontSensorVoltage() : driveSubsystem.getBackSensorVoltage());
+	}
+
+	@Override
+	protected boolean isFinished() {
+		if(isTimedOut())
+			return true;
+		
+		if(sensorVoltages.size() >= 100) {
 			double sum = 0.0;
 			for(double voltage : sensorVoltages)
 				sum += voltage;
 			
 			double distance = AnalogDistanceSensorLUT.calucateDistance(sum / sensorVoltages.size());
+			if(distance > 0 && distance <= distanceInches)
+				return true;
 			
 			sensorVoltages.clear();
 		}
-
-	}
-
-	@Override
-	protected boolean isFinished() {
-		return driveSubsystem.onTarget();
+		
+		return false;
 	}
 
 	@Override
     protected void end() {
-        driveSubsystem.disable();
         driveSubsystem.stop();
     }
 	
