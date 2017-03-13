@@ -53,6 +53,7 @@ public class DriveTo extends Command {
 				sum += voltage;
 			
 			double distance = AnalogDistanceSensorLUT.calucateDistance(sum / sensorVoltages.size());
+			
 			if(distance > 0 && distance <= distanceInches)
 				return true;
 			
