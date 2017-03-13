@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.usfirst.frc.team4711.robot.config.AnalogDistanceSensorLUT;
-import org.usfirst.frc.team4711.robot.config.LauncherSpeedLUT;
 import org.usfirst.frc.team4711.robot.subsystems.DriveSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
