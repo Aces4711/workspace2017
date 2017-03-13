@@ -23,7 +23,7 @@ public class LauncherSpeedLUT {
 
 	public static double calculateRPM(double distanceInches){
 		if(distanceInches < 24 || distanceInches > 60)
-			return 0.0;
+			return -1.0;
 		
 		Iterator<Integer> keys = lut.keySet().iterator();
 		int lowKey = keys.next();

@@ -36,7 +36,7 @@ public class ControllerSubsystem extends Subsystem {
 		winchDownButton.toggleWhenPressed(new RunClimber(-1.0));
 		
 		continuousLaunchButton = new JoystickButton(joystick, KeyMap.CONTINUOUS_LAUNCH);
-		continuousLaunchButton.toggleWhenPressed(new RunLauncher());
+		continuousLaunchButton.toggleWhenPressed(new RunLauncher(3000));
 	}
 	
 	@Override

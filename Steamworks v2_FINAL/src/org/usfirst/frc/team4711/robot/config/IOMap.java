@@ -23,6 +23,7 @@ public class IOMap {
 	
 
 	public static final int GYRO_CHANNEL = 0;
+	public static final double ROBOT_WIDTH = 40; // used instead of the gryo
 
 	/*
 	//in inches
@@ -44,12 +45,8 @@ public class IOMap {
 	
 	// wacky stuff
 	public static final int JOYSTICK_PORT = 0;
-	
 	public static final int FRONT_SENSOR = 0;
-	
 	public static final int BACK_SENSOR = 1;
-	
-	public static final int AUTONOMOUS_DURATION = 15; // in seconds
 	
 	// controller junk
 	public static final int A = 1;

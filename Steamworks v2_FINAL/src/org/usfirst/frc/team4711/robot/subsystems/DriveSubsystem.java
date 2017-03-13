@@ -2,6 +2,7 @@ package org.usfirst.frc.team4711.robot.subsystems;
 
 import org.usfirst.frc.team4711.robot.commands.DriveWithJoystick;
 import org.usfirst.frc.team4711.robot.config.IOMap;
+import org.usfirst.frc.team4711.robot.config.MotorSpeeds;
 import org.usfirst.frc.team4711.robot.wrappers.CustomDrive;
 
 import com.ctre.CANTalon;
@@ -27,6 +28,7 @@ public class DriveSubsystem extends PIDSubsystem {
 	private CustomDrive wheels;
 
 	private AnalogGyro gyro;
+	private double startPosition; //only if no gyro
 	
 	private AnalogInput frontDistanceSensor;
 	private AnalogInput backDistanceSensor;
@@ -67,21 +69,14 @@ public class DriveSubsystem extends PIDSubsystem {
 			gyro.setSensitivity(.3);
 		} catch (Exception e) {
 			System.out.println("No gyroscrope found, rotation will be based on position");
+			startPosition = 0.0;
 		}
-		
-		//frontDistanceSensor = new AnalogInput(0);
-		//backDistanceSensor = new AnalogInput(1);
 
         setAbsoluteTolerance(10);
 		setState(State.TELEOP);
 		
 		frontDistanceSensor = new AnalogInput(IOMap.FRONT_SENSOR);
-		frontDistanceSensor.setOversampleBits(4);
-		frontDistanceSensor.setAverageBits(2);
-		
 		backDistanceSensor = new AnalogInput(IOMap.BACK_SENSOR);
-		backDistanceSensor.setOversampleBits(4);
-		backDistanceSensor.setAverageBits(2);
 	}
 	
 	public static DriveSubsystem getInstance(){
@@ -102,7 +97,11 @@ public class DriveSubsystem extends PIDSubsystem {
 		case AUTO_STRAIGHT:
 			return Math.min(-backLeftWithEncoder.getPosition(), backRightWithEncoder.getPosition());
 		case AUTO_TURN:
-			return gyro.getAngle();
+			double pidInput = 0.0;
+			if(gyro != null)
+				pidInput = gyro.getAngle();
+			else
+				pidInput = startPosition - backLeftWithEncoder.getPosition() / IOMap.r
 		default:
 			break;
 		}
@@ -114,8 +113,10 @@ public class DriveSubsystem extends PIDSubsystem {
 	protected void usePIDOutput(double output) {
 		switch(state){
 		case AUTO_STRAIGHT:
-			arcadeDrive(-output, 0);
-			//arcadeDrive(output, -gyroscope.getAngle() * .03);
+			if(gyro != null)
+				arcadeDrive(output, -gyro.getAngle() * .03);
+			else
+				arcadeDrive(output, 0);
 			break;
 		case AUTO_TURN:
 			wheels.tankDrive(-output, output);
@@ -125,16 +126,16 @@ public class DriveSubsystem extends PIDSubsystem {
 		}
 	}
 	
-	public double getFrontDistance() {
-		return frontDistanceSensor.getValue();
+	public double getFrontSensorVoltage() {
+		return frontDistanceSensor.getVoltage();
 	}
 	
-	public double getBackDistance() {
-		return backDistanceSensor.getValue();
+	public double getBackSensorVoltage() {
+		return backDistanceSensor.getVoltage();
 	}
 	
 	public void arcadeDrive(double moveValue, double rotateValue){
-		wheels.arcadeDrive(moveValue, rotateValue);
+		wheels.arcadeDrive(moveValue * MotorSpeeds.DRIVE_SPEED, rotateValue);
 	}
 	
 	public void setMoveBy(double distanceInches){

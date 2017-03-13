@@ -9,16 +9,12 @@ import edu.wpi.first.wpilibj.command.Command;
 public class RunLauncher extends Command {
 
 	private LauncherSubsystem launchSubsystem;
-	private DriveSubsystem driveSubsystem;
 	
 	public RunLauncher() {
 		super("runLaunch");
 		
 		launchSubsystem = LauncherSubsystem.getInstance();
 		requires(launchSubsystem);
-		
-		driveSubsystem = DriveSubsystem.getInstance();
-		requires(driveSubsystem);
 		
 		setTimeout(30);
 	}

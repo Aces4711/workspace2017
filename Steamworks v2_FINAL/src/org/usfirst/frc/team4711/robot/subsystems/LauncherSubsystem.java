@@ -33,6 +33,7 @@ public class LauncherSubsystem extends Subsystem {
 		launcherWithEncoder.setF(IOMap.LAUNCHER_SPEED_PID[3]);
 
 		launcherWithEncoder.reverseSensor(true);
+		launcherWithEncoder.enableControl();
 	}
 	
 	@Override

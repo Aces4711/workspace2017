@@ -31,7 +31,7 @@ public class AnalogDistanceSensorLUT {
 	// returns inches
 	public static double calucateDistance(double voltage){
 		if(voltage < .4 || voltage > 2.5)
-			return 0.0;
+			return -1.0;
 		
 		Iterator<Double> keys = lut.keySet().iterator();
 		double lowKey = keys.next();
