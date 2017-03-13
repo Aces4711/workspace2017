@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4711.robot.config;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class LauncherSpeedLUT {
@@ -10,7 +10,7 @@ public class LauncherSpeedLUT {
 	public static Map<Integer, Integer> lut = createMap();
 
 	private static Map<Integer, Integer> createMap(){
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> map = new LinkedHashMap<Integer, Integer>();
 		map.put(60, 3000);
 		map.put(54, 2500);
 		map.put(48, 1800);
@@ -33,11 +33,11 @@ public class LauncherSpeedLUT {
 			lowKey = keys.next();
 		}
 		
-		double differenceOfKeys = highKey - lowKey;
-		double percent = (distanceInches - lowKey) / differenceOfKeys;
+		float differenceOfKeys = highKey - lowKey;
+		double percent = (differenceOfKeys > 0 ) ? (distanceInches - lowKey) / differenceOfKeys : 0.0;
 		
-		double lowValue = (double) lut.get(lowKey);
-		double highValue = (double) lut.get(highKey);
+		double lowValue = lut.get(lowKey).doubleValue();
+		double highValue = lut.get(highKey).doubleValue();
 		
 		return lowValue + percent*(highValue - lowValue);
 	}
