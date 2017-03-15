@@ -9,6 +9,7 @@ import com.ctre.CANTalon;
 
 public class BallLauncher implements ISubsystem {
 
+	private CANTalon augger;
 	private CANTalon launcher;
 	
 	private boolean active;
@@ -16,6 +17,7 @@ public class BallLauncher implements ISubsystem {
 	private long startTime;
 	
 	public BallLauncher() {
+		this.augger = new CANTalon(IOMap.BALL_AUGGER);
 		this.launcher = new CANTalon(IOMap.BALL_LAUNCH_CHANNEL);
 		
 		this.active = false;
@@ -32,11 +34,19 @@ public class BallLauncher implements ISubsystem {
 		boolean single_launch_pressed = Robot.joystick.getRawButton(KeyMap.SINGLE_LAUNCH);
 		
 		// start spinning up the launcher
-		if (single_launch_pressed || continuous_launch_pressed) {
-			
+		/**if (single_launch_pressed) {
+			this.augger.set(MotorSpeeds.AUGGER_SPEED);
+		}**/
+		
+		if (continuous_launch_pressed) {
+			this.augger.set(MotorSpeeds.AUGGER_SPEED);
+			this.launcher.set(MotorSpeeds.LAUNCHER_SPEED);
+		} else {
+			this.augger.set(0);
+			this.launcher.set(0);
 		}
 		
-		// this section handles the ball movey thingy
+		/** this section handles the ball movey thingy
 		if (single_launch_pressed && !active) {
 			this.startTime = System.currentTimeMillis();
 			this.active = true;
@@ -45,10 +55,10 @@ public class BallLauncher implements ISubsystem {
 		}
 		
 		if (active || continuous_launch_pressed) {
-			this.launcher.set(MotorSpeeds.LAUNCHER_SPEED);
+			this.augger.set(MotorSpeeds.LAUNCHER_SPEED);
 		} else {
-			this.launcher.set(0);
-		}
+			this.augger.set(0);
+		}**/
 		// end
 		
 		
@@ -58,6 +68,7 @@ public class BallLauncher implements ISubsystem {
 	public void start() {
 		this.active = true;
 	
+		this.augger.set(MotorSpeeds.AUGGER_SPEED);
 		this.launcher.set(MotorSpeeds.LAUNCHER_SPEED);
 	}
 	
@@ -65,7 +76,7 @@ public class BallLauncher implements ISubsystem {
 	public void stop() {
 		this.active = false;
 		
-		this.launcher.set(0);
+		this.augger.set(0);
 	}
 
 	@Override

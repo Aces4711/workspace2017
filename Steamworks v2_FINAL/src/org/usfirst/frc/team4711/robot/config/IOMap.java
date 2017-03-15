@@ -48,6 +48,9 @@ public class IOMap {
 	public static final int FRONT_SENSOR = 0;
 	public static final int BACK_SENSOR = 1;
 	
+	//gear
+	public static final int GEAR_LIMIT_SWITCH = 0;
+	
 	// controller junk
 	public static final int A = 1;
 	public static final int B = 2;
@@ -67,8 +70,14 @@ public class IOMap {
 	public static final int AXIS_TRIGGER_LEFT = 5;
 	public static final int AXIS_TRIGGER_RIGHT = 6;
 	
-	//robot eye
-	public static final int CAMERA_IMG_WIDTH = 650;
-	public static final int CAMERA_IMG_HEIGHT = 480;
+	//only can use 160x120, 320x240, 640x480
+	public static final int CAMERA_IMG_WIDTH = 320;
+	public static final int CAMERA_IMG_HEIGHT = 240;
+	
+	//aim box of camera
+	public static final int AIM_BOX_X = 50;
+	public static final int AIM_BOX_Y = 50;
+	public static final int AIM_BOX_WIDTH = 50;
+	public static final int AIM_BOX_LENGHT = 50;
 }
 

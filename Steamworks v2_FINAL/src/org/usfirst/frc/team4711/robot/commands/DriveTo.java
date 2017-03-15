@@ -46,7 +46,7 @@ public class DriveTo extends Command {
 		if(isTimedOut())
 			return true;
 		
-		if(sensorVoltages.size() >= 100) {
+		if(sensorVoltages.size() >= 3) {
 			double sum = 0.0;
 			for(double voltage : sensorVoltages)
 				sum += voltage;

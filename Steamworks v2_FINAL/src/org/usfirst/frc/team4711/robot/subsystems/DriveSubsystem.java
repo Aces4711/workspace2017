@@ -95,13 +95,16 @@ public class DriveSubsystem extends PIDSubsystem {
 	protected double returnPIDInput() {
 		switch(state){
 		case AUTO_STRAIGHT:
-			return Math.min(-backLeftWithEncoder.getPosition(), backRightWithEncoder.getPosition());
+			return backLeftWithEncoder.getPosition();
 		case AUTO_TURN:
 			double pidInput = 0.0;
 			if(gyro != null)
 				pidInput = gyro.getAngle();
-			else
-				pidInput = startPosition - backLeftWithEncoder.getPosition() / IOMap.r
+			else {
+				pidInput = (startPosition - backLeftWithEncoder.getPosition()) / (IOMap.ROBOT_WIDTH * .5);
+				pidInput *= 180 / Math.PI;
+			}
+			return pidInput ;
 		default:
 			break;
 		}
@@ -119,7 +122,7 @@ public class DriveSubsystem extends PIDSubsystem {
 				arcadeDrive(output, 0);
 			break;
 		case AUTO_TURN:
-			wheels.tankDrive(-output, output);
+			wheels.tankDrive(-output * MotorSpeeds.DRIVE_SPEED, output  * MotorSpeeds.DRIVE_SPEED);
 			break;
 		default:
 			break;
@@ -146,6 +149,8 @@ public class DriveSubsystem extends PIDSubsystem {
 	
 	public void setRotateBy(double angle){
 		setState(DriveSubsystem.State.AUTO_TURN);
+		if(gyro == null)
+			startPosition = backLeftWithEncoder.getPosition();
 		setSetpointRelative(angle);
 	}
 	

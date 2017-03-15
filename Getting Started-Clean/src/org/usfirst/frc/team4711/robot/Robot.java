@@ -49,6 +49,7 @@ public class Robot extends IterativeRobot {
 		this.rangeFinderA = new AnalogInput(0);
 		this.rangeFinderA.setOversampleBits(4);
 		this.rangeFinderA.setAverageBits(2);
+		 
     }
     
     /**

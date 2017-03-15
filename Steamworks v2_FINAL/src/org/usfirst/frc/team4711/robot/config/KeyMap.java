@@ -6,6 +6,6 @@ public class KeyMap {
 	public static final int INTAKE = IOMap.X;
 	public static final int INTAKE_UNJAM = IOMap.Y;
 	public static final int CONTINUOUS_LAUNCH = IOMap.TRIGGER_LT;
-	public static final int SINGLE_LAUNCH = IOMap.TRIGGER_RT;
+	public static final int DISTANCE_LAUNCH = IOMap.TRIGGER_RT;
 	public static final int AIM = IOMap.BACK;
 }

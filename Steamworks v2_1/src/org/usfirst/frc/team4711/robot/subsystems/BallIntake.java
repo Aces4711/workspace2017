@@ -33,7 +33,7 @@ public class BallIntake implements ISubsystem {
 		boolean intake_pressed = Robot.joystick.getRawButton(KeyMap.INTAKE);
 		boolean unjam_pressed = Robot.joystick.getRawButton(KeyMap.INTAKE_UNJAM);
 		
-		if (intake_pressed && !button_pressed) {
+		/**if (intake_pressed && !button_pressed) {
 			this.active = !active;
 			this.button_pressed = true;
 			
@@ -41,6 +41,14 @@ public class BallIntake implements ISubsystem {
 			
 		} else if (!intake_pressed && button_pressed) {
 			this.button_pressed = false;
+		}**/
+		
+		if (intake_pressed) {
+			this.intake.set(MotorSpeeds.INTAKE_SPEED);
+		} else if (unjam_pressed) {
+			this.intake.set(-MotorSpeeds.INTAKE_SPEED);
+		} else {
+			this.intake.set(0);
 		}
 		
 		// end section

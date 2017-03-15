@@ -1,11 +1,17 @@
 package org.usfirst.frc.team4711.robot.subsystems;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-
+import org.usfirst.frc.team4711.robot.config.AnalogDistanceSensorLUT;
 import org.usfirst.frc.team4711.robot.config.IOMap;
+import org.usfirst.frc.team4711.robot.config.LauncherSpeedLUT;
 import org.usfirst.frc.team4711.robot.vision.GripPipeline;
 
 import edu.wpi.cscore.UsbCamera;
@@ -17,10 +23,14 @@ import edu.wpi.cscore.CvSource;
 
 public class RobotEyeSubsystem extends Subsystem {
 
+	private Thread visionThread;
+	
 	private CvSink cvSink;
 	private CvSource cvSource;
 	
 	private GripPipeline gripPipeline;
+	
+	private Mat image;
 	
 	private static RobotEyeSubsystem instance;
 	
@@ -29,6 +39,7 @@ public class RobotEyeSubsystem extends Subsystem {
 
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 		camera.setResolution(IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT);
+		camera.setBrightness(25);
 		
 		cvSink = CameraServer.getInstance().getVideo();
 		cvSource = CameraServer.getInstance().putVideo("RobotEye", IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT);
@@ -47,6 +58,65 @@ public class RobotEyeSubsystem extends Subsystem {
 		return instance;
 	}
 	
+	public void startVision(){
+		visionThread = new Thread(() -> {
+			Mat source = new Mat();
+			
+			List<Double> sensorVoltages = new ArrayList<Double>();
+			double distance = -1.0;
+			
+			final Point recStart = new Point(IOMap.AIM_BOX_X, IOMap.AIM_BOX_Y);
+			final Point recSize = new Point(IOMap.AIM_BOX_X+IOMap.AIM_BOX_WIDTH, IOMap.AIM_BOX_Y+IOMap.AIM_BOX_LENGHT);
+			
+			final Point textStart = new Point(IOMap.AIM_BOX_X, IOMap.AIM_BOX_Y + IOMap.AIM_BOX_LENGHT + 30);
+			
+			final Scalar white = new Scalar(255,255,255);
+			final Scalar green = new Scalar(0,255,0);
+			
+			while(!Thread.interrupted()){
+				if(cvSink.grabFrame(source)==0){
+					cvSource.notifyError(cvSink.getError());
+					continue;
+				}
+				
+				Imgproc.rectangle(
+						source, 
+						recStart, 
+						recSize, 
+						white, 
+						2);
+				
+				if(sensorVoltages.size() < 2)
+					sensorVoltages.add(DriveSubsystem.getInstance().getFrontSensorVoltage());
+				else {
+					double sum = 0.0;
+					for(double voltage : sensorVoltages)
+						sum += voltage;
+					distance = AnalogDistanceSensorLUT.calucateDistance(sum / sensorVoltages.size());
+					sensorVoltages.clear();
+				}
+				
+				Imgproc.putText(
+						source, 
+						"Distance : " + Math.round(distance) + " inches", 
+						textStart, 
+						Core.FONT_HERSHEY_COMPLEX, 
+						.5, 
+						(distance > 24 && distance < 60)? green : white,
+						1);
+				
+				cvSource.putFrame(source);
+			}
+		});
+		
+		visionThread.start();
+	}
+	
+	public void endVision() {
+		if(visionThread.getState() == Thread.State.RUNNABLE)
+			visionThread.interrupt();
+	}
+	
 	public void turnOn(){
 		//turn on lights
 	}
@@ -57,7 +127,7 @@ public class RobotEyeSubsystem extends Subsystem {
 	
 	//-1 <= value => 1, 0 been centered
 	public double getTargetCenterX(){
-		Mat image = new Mat();
+		image = new Mat();
 		cvSink.grabFrame(image);
 		gripPipeline.process(image);
 		

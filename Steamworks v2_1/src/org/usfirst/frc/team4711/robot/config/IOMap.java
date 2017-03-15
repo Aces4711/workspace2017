@@ -2,19 +2,19 @@ package org.usfirst.frc.team4711.robot.config;
 
 public class IOMap {
 	// drive
-	public static final int FRONT_LEFT_MOTOR_CHANNEL = 0;
-	public static final int REAR_LEFT_MOTOR_CHANNEL = 1;
-	public static final int FRONT_RIGHT_MOTOR_CHANNEL = 2;
-	public static final int REAR_RIGHT_MOTOR_CHANNEL = 3;
+	public static final int FRONT_LEFT_MOTOR_CHANNEL = 1;
+	public static final int REAR_LEFT_MOTOR_CHANNEL = 2;
+	public static final int FRONT_RIGHT_MOTOR_CHANNEL = 3;
+	public static final int REAR_RIGHT_MOTOR_CHANNEL = 4;
 	
 	// climber
-	public static final int LEFT_CLIMB_CHANNEL = 4;
-	public static final int RIGHT_CLIMB_CHANNEL = 5;
+	public static final int CLIMB_CHANNEL = 6;
+	//public static final int RIGHT_CLIMB_CHANNEL = 5;
 	
 	// ball handling
-	public static final int BALL_INTAKE_CHANNEL = 6;
-	public static final int BALL_AUGGER = 7;
-	public static final int BALL_LAUNCH_CHANNEL = 8;
+	public static final int BALL_INTAKE_CHANNEL = 7;
+	public static final int BALL_AUGGER = 8;
+	public static final int BALL_LAUNCH_CHANNEL = 5;
 	
 	// wacky stuff
 	public static final int JOYSTICK_PORT = 0;

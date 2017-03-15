@@ -1,6 +1,7 @@
 package org.usfirst.frc.team4711.robot.subsystems;
 
 import org.usfirst.frc.team4711.robot.commands.RunLauncher;
+import org.usfirst.frc.team4711.robot.commands.RunLauncherBaseOnDistance;
 import org.usfirst.frc.team4711.robot.commands.RunClimber;
 import org.usfirst.frc.team4711.robot.commands.RunIntake;
 import org.usfirst.frc.team4711.robot.config.IOMap;
@@ -17,6 +18,7 @@ public class ControllerSubsystem extends Subsystem {
 	private JoystickButton winchUpButton;
 	private JoystickButton winchDownButton;
 	private JoystickButton continuousLaunchButton;
+	private JoystickButton distanceLaunchButton;
 
 	private static ControllerSubsystem instance;
 	
@@ -37,6 +39,9 @@ public class ControllerSubsystem extends Subsystem {
 		
 		continuousLaunchButton = new JoystickButton(joystick, KeyMap.CONTINUOUS_LAUNCH);
 		continuousLaunchButton.toggleWhenPressed(new RunLauncher(3000));
+		
+		distanceLaunchButton = new JoystickButton(joystick, KeyMap.DISTANCE_LAUNCH);
+		distanceLaunchButton.toggleWhenPressed(new RunLauncherBaseOnDistance());
 	}
 	
 	@Override

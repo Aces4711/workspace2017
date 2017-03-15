@@ -8,9 +8,10 @@ import org.usfirst.frc.team4711.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.ISubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.RopeClimber;
 
+import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 
-public class Robot {
+public class Robot extends IterativeRobot {
 	
 	public static Joystick joystick;
 	
@@ -44,6 +45,6 @@ public class Robot {
     	
     	this.distanceFinder.teleopPeriodic();
     	
-    	System.out.println(((DistanceSubsystem) this.distanceFinder).getRange());
+    	//System.out.println(((DistanceSubsystem) this.distanceFinder).getRange());
     }
 }

@@ -16,6 +16,8 @@ public class RotateTo extends Command {
 		
 		driveSubsystem = DriveSubsystem.getInstance();
 		requires(driveSubsystem);
+		
+		setTimeout(10 * Math.abs(angle / 360));
 	}
 	
 	@Override
@@ -26,11 +28,13 @@ public class RotateTo extends Command {
 	
 	@Override
 	protected void execute() {
+		System.out.println("Rotation - (SetPoint, Position): (" + driveSubsystem.getSetpoint() + ", " 
+							+ driveSubsystem.getPosition() +")");
 	}
 	
 	@Override
 	protected boolean isFinished() {
-		return driveSubsystem.onTarget();
+		return driveSubsystem.onTarget() || isTimedOut();
 	}
 
 	@Override
