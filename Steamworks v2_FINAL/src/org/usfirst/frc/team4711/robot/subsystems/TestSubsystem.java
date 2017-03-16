@@ -7,10 +7,12 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team4711.robot.config.AnalogDistanceSensorLUT;
 import org.usfirst.frc.team4711.robot.config.IOMap;
+import org.usfirst.frc.team4711.robot.vision.GripPipeline;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
@@ -34,6 +36,7 @@ public class TestSubsystem extends Subsystem{
 	private double wheelCircumference = Math.PI * 7; // 21.98 inches;
 	
 	private Thread vision;
+	private Thread visionPipeline;
 	
 	private static TestSubsystem instance;
 	
@@ -109,6 +112,38 @@ public class TestSubsystem extends Subsystem{
 			}
 		});
 		
+		visionPipeline = new Thread(()->{
+			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+			//only can use 160x120, 320x240, 640x480
+			camera.setResolution(320, 240);
+			camera.setBrightness(25);
+		
+			CvSink cvSink = CameraServer.getInstance().getVideo();
+			CvSource cvSource = CameraServer.getInstance().putVideo("Output", IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT);
+			
+			GripPipeline gripPipeline = new GripPipeline();
+			Mat source = new Mat();
+			
+			while(!Thread.interrupted()){
+				if(cvSink.grabFrame(source)==0){
+					cvSource.notifyError(cvSink.getError());
+					continue;
+				}
+
+				gripPipeline.process(source);
+				if (!gripPipeline.filterContoursOutput().isEmpty()){
+					Rect r = Imgproc.boundingRect(gripPipeline.filterContoursOutput().get(0));
+					Imgproc.rectangle(
+							source, 
+							new Point(r.x, r.y), 
+							new Point(r.x + r.width, r.y + r.height), 
+							new Scalar(255, 255, 255), 
+							2);
+				}
+				cvSource.putFrame(source);
+			}
+		});
+		
 	}
 	
 	@Override
@@ -124,8 +159,12 @@ public class TestSubsystem extends Subsystem{
 	}
 	
 	public void startCamera(){
+		/*
 		if(!vision.isAlive())
 			vision.start();
+		*/
+		if(!visionPipeline.isAlive())
+			visionPipeline.start();
 	}
 	
 	public void log(){
