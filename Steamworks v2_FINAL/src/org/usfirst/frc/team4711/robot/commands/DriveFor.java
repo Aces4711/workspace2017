@@ -18,29 +18,32 @@ public class DriveFor extends Command {
 		driveSubsystem = DriveSubsystem.getInstance();
 		requires(driveSubsystem);
 		
-		setTimeout(30);
+		setTimeout(3);
 	}
 	
 	@Override
 	protected void initialize() {
+		//driveSubsystem.arcadeDrive(1.0, 0);
 		driveSubsystem.setMoveBy(distanceInches);
-		driveSubsystem.enable();
+		//driveSubsystem.enable();
 	}
 	
 	@Override
 	protected void execute() {
+		driveSubsystem.driveStraight(distanceInches > 0 ? .7 : -.7);
 		System.out.println("Distance - (SetPoint, Position): (" + driveSubsystem.getSetpoint() + ", " 
 							+ driveSubsystem.getPosition() +")");
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return driveSubsystem.onTarget() || isTimedOut();
+		//return isTimedOut();
+		return Math.abs(driveSubsystem.getSetpoint() - driveSubsystem.getPosition()) < .1 || isTimedOut();
 	}
 
 	@Override
     protected void end() {
-        driveSubsystem.disable();
+        //driveSubsystem.disable();
         driveSubsystem.stop();
     }
 	

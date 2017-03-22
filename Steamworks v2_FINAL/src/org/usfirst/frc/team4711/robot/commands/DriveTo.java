@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.usfirst.frc.team4711.robot.config.AnalogDistanceSensorLUT;
 import org.usfirst.frc.team4711.robot.subsystems.DriveSubsystem;
+import org.usfirst.frc.team4711.robot.subsystems.RobotEyeSubsystem;
 
 import edu.wpi.first.wpilibj.command.Command;
 
@@ -13,7 +14,7 @@ public class DriveTo extends Command {
 	private double distanceInches;
 	private boolean isForward;
 	
-	private List<Double> sensorVoltages;
+	private List<Double> sensorDistances;
 	
 	private DriveSubsystem driveSubsystem;
 
@@ -26,19 +27,20 @@ public class DriveTo extends Command {
 		driveSubsystem = DriveSubsystem.getInstance();
 		requires(driveSubsystem);
 
-		setTimeout(30);	
+		setTimeout(3);	
 	}
 	
 	@Override
 	protected void initialize() {
-		driveSubsystem.arcadeDrive((isForward) ? 1.0 : -1.0, 0.0);
-
-		sensorVoltages = new ArrayList<Double>();
+		sensorDistances = new ArrayList<Double>();
 	}
 	
 	@Override
 	protected void execute() {
-		sensorVoltages.add((isForward) ? driveSubsystem.getFrontSensorVoltage() : driveSubsystem.getBackSensorVoltage());
+		driveSubsystem.driveStraight((isForward) ? 0.7 : -.7);
+		double distance = AnalogDistanceSensorLUT.calucateDistance((isForward) ? driveSubsystem.getFrontSensorVoltage() : driveSubsystem.getBackSensorVoltage());
+		if(distance > 0)
+			sensorDistances.add(distance);
 	}
 
 	@Override
@@ -46,17 +48,17 @@ public class DriveTo extends Command {
 		if(isTimedOut())
 			return true;
 		
-		if(sensorVoltages.size() >= 3) {
+		if(sensorDistances.size() >= 3) {
 			double sum = 0.0;
-			for(double voltage : sensorVoltages)
-				sum += voltage;
+			for(double distance : sensorDistances)
+				sum += distance;
 			
-			double distance = AnalogDistanceSensorLUT.calucateDistance(sum / sensorVoltages.size());
+			double mean = sum / sensorDistances.size();
 			
-			if(distance > 0 && distance <= distanceInches)
+			if(mean > 0 && mean <= distanceInches)
 				return true;
 			
-			sensorVoltages.clear();
+			sensorDistances.clear();
 		}
 		
 		return false;

@@ -32,13 +32,20 @@ public class RunLauncher extends Command {
 	
 	@Override
 	protected boolean isFinished() {
+		
 		return isTimedOut();
 	}
 	
 	@Override
     protected void end() {
-		launchSubsystem.setAuggerSpeed(0.0);
 		launchSubsystem.setLauncherSpeed(0.0);
+		launchSubsystem.setAuggerSpeed(-1.0);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		launchSubsystem.setAuggerSpeed(0.0);
     }
 	
 	@Override

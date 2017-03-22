@@ -1,5 +1,7 @@
 package org.usfirst.frc.team4711.robot.commands;
 
+import org.usfirst.frc.team4711.robot.config.IOMap;
+import org.usfirst.frc.team4711.robot.config.KeyMap;
 import org.usfirst.frc.team4711.robot.subsystems.ControllerSubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.RobotEyeSubsystem;
@@ -27,11 +29,20 @@ public class DriveWithJoystick extends Command {
 	}
 	
 	protected void initialize() {
-		robotEyeSubsystem.startVision();
+		robotEyeSubsystem.startVisionFront();
+		//robotEyeSubsystem.startVisionBack();
+		
     }
 
     protected void execute() {
-    	driveSubsystem.arcadeDrive(controllerSubsystem.getController().getAxis(AxisType.kY), controllerSubsystem.getController().getAxis(AxisType.kX));
+    	
+    	//driveSubsystem.arcadeDrive(controllerSubsystem.getController().getRawAxis(IOMap.AXIS_LEFT_Y), controllerSubsystem.getController().getRawAxis(IOMap.AXIS_RIGHT_X));
+    	driveSubsystem.arcadeDrive((controllerSubsystem.getController().getRawAxis(KeyMap.ACCEL_FORWARD) > 0)? 
+    										controllerSubsystem.getController().getRawAxis(KeyMap.ACCEL_FORWARD) :
+    											((controllerSubsystem.getController().getRawAxis(KeyMap.ACCEL_BACK) > 0)? 
+    													-controllerSubsystem.getController().getRawAxis(KeyMap.ACCEL_BACK):
+    														0.0), -controllerSubsystem.getController().getRawAxis(IOMap.AXIS_LEFT_X));
+        
     }
     
 	@Override
@@ -42,7 +53,8 @@ public class DriveWithJoystick extends Command {
 	@Override
     protected void end() {
 		driveSubsystem.stop();
-		robotEyeSubsystem.endVision();
+		robotEyeSubsystem.endVisionFront();
+		//robotEyeSubsystem.endVisionBack();
     }
 	
 	@Override

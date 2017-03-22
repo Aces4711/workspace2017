@@ -16,6 +16,8 @@ public class LauncherSubsystem extends Subsystem {
 	
 	private static LauncherSubsystem instance;
 	
+	private boolean readyOrNotHereICome = false;
+	
 	private LauncherSubsystem() {
 		super("launcherSubsystem");
 		
@@ -50,6 +52,7 @@ public class LauncherSubsystem extends Subsystem {
 	public void setLauncherRPM(double rpm){
 		launcherWithEncoder.changeControlMode(TalonControlMode.Speed);
 		launcherWithEncoder.set(-rpm);
+		//readyOrNotHereICome = true;
 	}
 	
 	public boolean isLauncherReady(){
@@ -64,6 +67,10 @@ public class LauncherSubsystem extends Subsystem {
 	
 	public void setAuggerSpeed(double moveValue){
 		augger.set(moveValue * MotorSpeeds.AUGGER_SPEED);
+	}
+	
+	public boolean isAuggerOn() {
+		return augger.getSpeed() != 0;
 	}
 
 }

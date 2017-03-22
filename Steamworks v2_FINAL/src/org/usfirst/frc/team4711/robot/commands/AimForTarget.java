@@ -19,12 +19,12 @@ public class AimForTarget extends Command {
 		driveSubsystem = DriveSubsystem.getInstance();
 		requires(driveSubsystem);
 		
-		setTimeout(10);
+		//setTimeout(10);
 	}
 	
 	@Override
 	protected void initialize() {
-		robotEyeSubsystem.turnOn();
+		robotEyeSubsystem.startVisionBack();
 	}
 	
 	@Override
@@ -39,8 +39,8 @@ public class AimForTarget extends Command {
 	
 	@Override
     protected void end() {
+		robotEyeSubsystem.endVisionBack();
 		driveSubsystem.stop();
-		robotEyeSubsystem.turnOff();
     }
 	
 	@Override

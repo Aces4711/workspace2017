@@ -58,8 +58,14 @@ public class RunLauncherBaseOnDistance extends Command {
 	
 	@Override
     protected void end() {
-		launchSubsystem.setAuggerSpeed(0.0);
 		launchSubsystem.setLauncherSpeed(0.0);
+		launchSubsystem.setAuggerSpeed(-1.0);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		launchSubsystem.setAuggerSpeed(0.0);
     }
 	
 	@Override

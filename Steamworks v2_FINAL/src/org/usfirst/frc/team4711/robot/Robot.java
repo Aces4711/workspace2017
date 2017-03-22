@@ -13,9 +13,9 @@ public class Robot extends IterativeRobot {
 	private Command teleopCommand;
 	
 	public void robotInit() {
-		//autonomousCommand = new DropNShoot();
-		//teleopCommand = new DriveWithJoystick();
-		teleopCommand = new RunTest(RunTest.State.FREE, 0.0);
+		autonomousCommand = new DropNShoot();
+		teleopCommand = new DriveWithJoystick();
+		//teleopCommand = new RunTest(RunTest.State.FREE, 0.0);
 	}
 	
 	public void teleopInit() {
@@ -42,3 +42,4 @@ public class Robot extends IterativeRobot {
 		Scheduler.getInstance().run();
 	}
 }
+//Justice was here, tweaking the code against permission. (This is the tweak.)
