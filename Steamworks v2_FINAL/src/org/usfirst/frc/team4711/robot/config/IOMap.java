@@ -26,7 +26,6 @@ public class IOMap {
 	
 	// climber
 	public static final int LEFT_CLIMB_CHANNEL = 6;
-	//public static final int RIGHT_CLIMB_CHANNEL = 5;
 	
 	// ball handling
 	public static final int BALL_INTAKE_CHANNEL = 7;
@@ -36,11 +35,18 @@ public class IOMap {
 	// wacky stuff
 	public static final int JOYSTICK_PORT = 0;
 	
-	public static final int FRONT_SENSOR = 0;
-	public static final int BACK_SENSOR = 1;
+	//Distance sensors
+	public static final int LEFT_DISTANCE_SENSOR = 0;
+	public static final int RIGHT_DISTANCE_SENSOR = 1;
+	public static final int SPACE_BETWEEN_DISTANCE_SENSORS = 24;
+	public static final int SPACE_FROM_BUMPER_TO_DISTANCE_SENSORS = 8;
 	
 	//gear
-	public static final int GEAR_LIMIT_SWITCH = 0;
+	public static final int GEAR_DIO_SWITCH = 2;
+	
+	//start position switches
+	public static final int LEFT_DIO_SWITCH = 0;
+	public static final int RIGHT_DIO_SWITCH = 1;
 	
 	// controller junk
 	public static final int A = 1;

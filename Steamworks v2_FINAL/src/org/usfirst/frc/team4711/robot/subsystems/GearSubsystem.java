@@ -14,7 +14,7 @@ public class GearSubsystem extends Subsystem {
 	private GearSubsystem() {
 		super("gearSubsystem");
 
-		limitSwitch = new DigitalInput(IOMap.GEAR_LIMIT_SWITCH);
+		limitSwitch = new DigitalInput(IOMap.GEAR_DIO_SWITCH);
 	}
 	
 	@Override

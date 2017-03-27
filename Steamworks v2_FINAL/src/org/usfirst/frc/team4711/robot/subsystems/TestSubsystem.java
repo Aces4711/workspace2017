@@ -6,6 +6,7 @@ import java.util.List;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
@@ -116,7 +117,7 @@ public class TestSubsystem extends Subsystem{
 			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 			//only can use 160x120, 320x240, 640x480
 			camera.setResolution(320, 240);
-			camera.setBrightness(25);
+			camera.setBrightness(0);
 		
 			CvSink cvSink = CameraServer.getInstance().getVideo();
 			CvSource cvSource = CameraServer.getInstance().putVideo("Output", IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT);
@@ -131,15 +132,44 @@ public class TestSubsystem extends Subsystem{
 				}
 
 				gripPipeline.process(source);
+				double positionX = 0.0;
+				
 				if (!gripPipeline.filterContoursOutput().isEmpty()){
-					Rect r = Imgproc.boundingRect(gripPipeline.filterContoursOutput().get(0));
+					Rect r = new Rect(IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT, 0, 0);
+					for(MatOfPoint matOfPoint : gripPipeline.filterContoursOutput()) {
+						Rect temp = Imgproc.boundingRect(matOfPoint);
+						r.x = Math.min(r.x, temp.x);
+						r.y = Math.min(r.y, temp.y);
+						r.width = Math.max(r.x + r.width, temp.x + temp.width) - r.x;
+						r.height = Math.max(r.y + r.height, temp.y + temp.height) - r.y;
+					}
+					
 					Imgproc.rectangle(
 							source, 
-							new Point(r.x, r.y), 
+							new Point(r.x,r.y), 
 							new Point(r.x + r.width, r.y + r.height), 
 							new Scalar(255, 255, 255), 
 							2);
+					
+		            double rectCenterX = r.x + (r.width / 2);
+		            double camImgCenterX = IOMap.CAMERA_IMG_WIDTH / 2;
+		            positionX = -((camImgCenterX - rectCenterX) / camImgCenterX);
 				}
+				
+				Imgproc.line(
+						source, 
+						new Point(IOMap.CAMERA_IMG_WIDTH / 2, 0), 
+						new Point(IOMap.CAMERA_IMG_WIDTH / 2, IOMap.CAMERA_IMG_HEIGHT), 
+						new Scalar(255,255,255));
+				
+				Imgproc.putText(
+						source, 
+						"position : " + positionX, 
+						new Point(10, 10), 
+						Core.FONT_HERSHEY_COMPLEX, 
+						.5, 
+						new Scalar(255,255,255),
+						1);
 				cvSource.putFrame(source);
 			}
 		});

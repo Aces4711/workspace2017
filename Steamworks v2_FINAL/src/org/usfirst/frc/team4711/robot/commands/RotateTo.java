@@ -23,23 +23,28 @@ public class RotateTo extends Command {
 	@Override
 	protected void initialize() {
 		driveSubsystem.setRotateBy(angle);
-		driveSubsystem.enable();
+		//used to start the PID Closed Loop
+		//driveSubsystem.enable();
 	}
 	
 	@Override
 	protected void execute() {
-		System.out.println("Rotation - (SetPoint, Position): (" + driveSubsystem.getSetpoint() + ", " 
-							+ driveSubsystem.getPosition() +")");
+		//no need if using the PID Closed Loop
+		driveSubsystem.turnOnAxis(angle > 0 ? 1.0 : -1.0);
+
 	}
 	
 	@Override
 	protected boolean isFinished() {
-		return driveSubsystem.onTarget() || isTimedOut();
+		//Same thing
+		//return driveSubsystem.onTarget() || isTimedOut();
+		return Math.abs(driveSubsystem.getSetpoint() - driveSubsystem.getPosition()) < .1 || isTimedOut();
 	}
 
 	@Override
     protected void end() {
-        driveSubsystem.disable();
+		//used to end the PID Closed Loop
+        //driveSubsystem.disable();
         driveSubsystem.stop();
     }
 	

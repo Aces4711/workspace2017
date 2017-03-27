@@ -56,7 +56,7 @@ public class RunTest extends Command {
 	@Override
 	protected void execute() {
 		if(state == State.FREE)
-			testSubsystem.setMotorSpeed(joystick.getAxis(AxisType.kY));
+			//testSubsystem.setMotorSpeed(joystick.getAxis(AxisType.kY));
 			
 		if(++count > 100){
 			testSubsystem.log();

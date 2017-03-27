@@ -4,7 +4,7 @@ import org.usfirst.frc.team4711.robot.commands.RunLauncher;
 import org.usfirst.frc.team4711.robot.commands.RunLauncherBaseOnDistance;
 import org.usfirst.frc.team4711.robot.commands.AimForTarget;
 import org.usfirst.frc.team4711.robot.commands.DriveFor;
-import org.usfirst.frc.team4711.robot.commands.DriveTo;
+import org.usfirst.frc.team4711.robot.commands.BackUpTo;
 import org.usfirst.frc.team4711.robot.commands.RunClimber;
 import org.usfirst.frc.team4711.robot.commands.RunIntake;
 import org.usfirst.frc.team4711.robot.config.IOMap;
@@ -42,17 +42,10 @@ public class ControllerSubsystem extends Subsystem {
 		winchDownButton.toggleWhenPressed(new RunClimber(-1.0));
 		
 		continuousLaunchButton = new JoystickButton(joystick, KeyMap.CONTINUOUS_LAUNCH);
-		continuousLaunchButton.toggleWhenPressed(new RunLauncher(5000));
+		continuousLaunchButton.toggleWhenPressed(new RunLauncher(3500));
 		
 		distanceLaunchButton = new JoystickButton(joystick, KeyMap.DISTANCE_LAUNCH);
-		distanceLaunchButton.toggleWhenPressed(new RunLauncherBaseOnDistance());
-		
-		//slowReverseButton = new JoystickButton(joystick, KeyMap.REVERSE_SLOW);
-
-		JoystickButton test = new JoystickButton(joystick, IOMap.START);
-		test.toggleWhenPressed(new AimForTarget());
-		
-		
+		distanceLaunchButton.toggleWhenPressed(new RunLauncherBaseOnDistance(48.0));
 		
 	}
 	

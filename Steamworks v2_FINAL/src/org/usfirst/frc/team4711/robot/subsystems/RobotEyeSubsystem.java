@@ -23,6 +23,9 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 
 public class RobotEyeSubsystem extends Subsystem {
+	public static enum Target {
+		GEAR, BASKET;
+	}
 
 	private Thread visionThreadFront;
 	private Thread visionThreadBack;
@@ -35,8 +38,7 @@ public class RobotEyeSubsystem extends Subsystem {
 	
 	private GripPipeline gripPipeline;
 	
-	private Mat imageBack;
-	
+	private Object lock;
 	private double positionX;
 	
 	private static RobotEyeSubsystem instance;
@@ -58,8 +60,10 @@ public class RobotEyeSubsystem extends Subsystem {
 		cvSinkBack = CameraServer.getInstance().getVideo(cameraBack);
 		cvSourceBack = CameraServer.getInstance().putVideo("RobotEyeBack", IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT);
 		
-		imageBack = new Mat();
 		gripPipeline = new GripPipeline();
+		
+		lock = new Object();
+		positionX = 1.0;
 	}
 	
 	@Override
@@ -74,64 +78,62 @@ public class RobotEyeSubsystem extends Subsystem {
 	}
 	
 	public void startVisionFront(){
+		synchronized (lock) {
+        	positionX = 1.0;
+        }
+		
 		visionThreadFront = new Thread(() -> {
-			List<Double> sensorVoltages = new ArrayList<Double>();
-			double distance = -1.0;
-			
-			final Point recStart = new Point(IOMap.AIM_BOX_X, IOMap.AIM_BOX_Y);
-			final Point recSize = new Point(IOMap.AIM_BOX_X+IOMap.AIM_BOX_WIDTH, IOMap.AIM_BOX_Y+IOMap.AIM_BOX_LENGHT);
-			
-			final Point textStart = new Point(IOMap.AIM_BOX_X, IOMap.AIM_BOX_Y + IOMap.AIM_BOX_LENGHT + 30);
-			final Point textStart2 = new Point(5, 5);
-			
-			final Scalar white = new Scalar(255,255,255);
-			final Scalar green = new Scalar(0,255,0);
+			//todo: create new filter pipeline for top targets else just doing the same as gears
+			Mat source = new Mat();
 			
 			while(!Thread.interrupted()){
-				if(cvSinkFront.grabFrame(imageBack)==0){
+				if(cvSinkFront.grabFrame(source)==0){
 					cvSourceFront.notifyError(cvSinkFront.getError());
 					continue;
 				}
 				
-				Imgproc.putText(
-						imageBack, 
-						"Front Camera:", 
-						new Point(IOMap.AIM_BOX_X, 15), 
-						Core.FONT_HERSHEY_COMPLEX, 
-						.5, 
-						white,
-						1);
-				
-				Imgproc.rectangle(
-						imageBack, 
-						recStart, 
-						recSize, 
-						white, 
-						2);
-				
-				if(sensorVoltages.size() < 2)
-					sensorVoltages.add(DriveSubsystem.getInstance().getFrontSensorVoltage());
-				else {
-					double sum = 0.0;
-					for(double voltage : sensorVoltages)
-						sum += voltage;
-					distance = AnalogDistanceSensorLUT.calucateDistance(sum / sensorVoltages.size());
-					sensorVoltages.clear();
+				gripPipeline.process(source);
+				if (!gripPipeline.filterContoursOutput().isEmpty()){
+					Rect r = new Rect(IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT, 0, 0);
+					for(MatOfPoint matOfPoint : gripPipeline.filterContoursOutput()) {
+						Rect temp = Imgproc.boundingRect(matOfPoint);
+						r.x = Math.min(r.x, temp.x);
+						r.y = Math.min(r.y, temp.y);
+						r.width = Math.max(r.x + r.width, temp.x + temp.width) - r.x;
+						r.height = Math.max(r.y + r.height, temp.y + temp.height) - r.y;
+					}
+					
+					Imgproc.rectangle(
+							source, 
+							new Point(r.x,r.y), 
+							new Point(r.x + r.width, r.y + r.height), 
+							new Scalar(255, 255, 255), 
+							2);
+					
+		            double rectCenterX = r.x + (r.width / 2);
+		            double camImgCenterX = IOMap.CAMERA_IMG_WIDTH / 2;
+		            
+		            synchronized (lock) {
+		            	positionX = -((camImgCenterX - rectCenterX) / camImgCenterX);
+		            }
 				}
 				
+				Imgproc.line(
+						source, 
+						new Point(IOMap.CAMERA_IMG_WIDTH / 2, 0), 
+						new Point(IOMap.CAMERA_IMG_WIDTH / 2, IOMap.CAMERA_IMG_HEIGHT), 
+						new Scalar(255,255,255));
+				
 				Imgproc.putText(
-						imageBack, 
-						"Distance : " + Math.round(distance) + " inches", 
-						textStart, 
+						source, 
+						"PositionX : " + getTargetCenterX(), 
+						new Point(10, 10), 
 						Core.FONT_HERSHEY_COMPLEX, 
 						.5, 
-						(distance > 24 && distance < 60)? green : white,
+						new Scalar(255,255,255),
 						1);
-				//if (LauncherSubsystem.getInstance().isLauncherReady()) {
-				//	Imgproc.putText(source, "Running augger, firing", textStart2, Core.FONT_HERSHEY_COMPLEX, .5, white);
-				//}
 				
-				cvSourceFront.putFrame(imageBack);
+				cvSourceFront.putFrame(source);
 			}
 		});
 		
@@ -144,14 +146,12 @@ public class RobotEyeSubsystem extends Subsystem {
 	}
 	
 	public void startVisionBack(){
+		synchronized (lock) {
+        	positionX = 1.0;
+        }
+		
 		visionThreadBack = new Thread(() -> {
 			Mat source = new Mat();
-			
-			List<Double> sensorVoltages = new ArrayList<Double>();
-			double distance = -1.0;
-			
-			final Point textStart = new Point(IOMap.AIM_BOX_X, IOMap.AIM_BOX_Y + IOMap.AIM_BOX_LENGHT + 30);
-			final Point textStart2 = new Point(10, 10);
 			
 			while(!Thread.interrupted()){
 				if(cvSinkBack.grabFrame(source)==0){
@@ -160,7 +160,6 @@ public class RobotEyeSubsystem extends Subsystem {
 				}
 				
 				gripPipeline.process(source);
-				
 				if (!gripPipeline.filterContoursOutput().isEmpty()){
 					Rect r = new Rect(IOMap.CAMERA_IMG_WIDTH, IOMap.CAMERA_IMG_HEIGHT, 0, 0);
 					for(MatOfPoint matOfPoint : gripPipeline.filterContoursOutput()) {
@@ -168,7 +167,7 @@ public class RobotEyeSubsystem extends Subsystem {
 						r.x = Math.min(r.x, temp.x);
 						r.y = Math.min(r.y, temp.y);
 						r.width = Math.max(r.x + r.width, temp.x + temp.width) - r.x;
-						r.height = Math.max(r.height + r.height, temp.x + temp.height) - r.y;
+						r.height = Math.max(r.y + r.height, temp.y + temp.height) - r.y;
 					}
 					
 					Imgproc.rectangle(
@@ -178,58 +177,26 @@ public class RobotEyeSubsystem extends Subsystem {
 							new Scalar(255, 255, 255), 
 							2);
 					
-		            //may have to re-think this whole thing lol
 		            double rectCenterX = r.x + (r.width / 2);
 		            double camImgCenterX = IOMap.CAMERA_IMG_WIDTH / 2;
-		            double distanceAway = (rectCenterX - camImgCenterX) / camImgCenterX;
-		            double returnValue = 1 - Math.abs(distanceAway);
 		            
-		            positionX = (distanceAway > 0)? returnValue : -returnValue;
+		            synchronized (lock) {
+		            	positionX = -((camImgCenterX - rectCenterX) / camImgCenterX);
+		            }
 				}
+				
+				Imgproc.line(
+						source, 
+						new Point(IOMap.CAMERA_IMG_WIDTH / 2, 0), 
+						new Point(IOMap.CAMERA_IMG_WIDTH / 2, IOMap.CAMERA_IMG_HEIGHT), 
+						new Scalar(255,255,255));
 				
 				Imgproc.putText(
 						source, 
-						"Back Camera:", 
-						new Point(IOMap.AIM_BOX_X, 15), 
+						"PositionX : " + getTargetCenterX(), 
+						new Point(10, 10), 
 						Core.FONT_HERSHEY_COMPLEX, 
 						.5, 
-						new Scalar(255,255,255),
-						1);
-				
-				if(sensorVoltages.size() < 2)
-					sensorVoltages.add(DriveSubsystem.getInstance().getBackSensorVoltage());
-				else {
-					double sum = 0.0;
-					for(double voltage : sensorVoltages)
-						sum += voltage;
-					distance = AnalogDistanceSensorLUT.calucateDistance(sum / sensorVoltages.size());
-					sensorVoltages.clear();
-				}
-				
-				Imgproc.putText(
-						source, 
-						"Distance : " + Math.round(distance) + " inches", 
-						textStart, 
-						Core.FONT_HERSHEY_COMPLEX, 
-						.5, 
-						new Scalar(255,255,255),
-						1);
-				
-				Imgproc.putText(
-						source,
-						(LauncherSubsystem.getInstance().isAuggerOn() ? "Augger is ON" : "Augger is OFF"),
-						textStart2,
-						Core.FONT_HERSHEY_COMPLEX,
-						.5,
-						new Scalar(255,255,255),
-						1);
-				
-				Imgproc.putText(
-						source,
-						"PositionX : " + positionX,
-						new Point(textStart.x, textStart.y + 30),
-						Core.FONT_HERSHEY_COMPLEX,
-						.5,
 						new Scalar(255,255,255),
 						1);
 				
@@ -247,7 +214,12 @@ public class RobotEyeSubsystem extends Subsystem {
 	
 	//-1 <= value => 1, 0 been centered
 	public double getTargetCenterX(){
-		return positionX;
+		double targetCenterX;
+		synchronized(lock){
+			targetCenterX = positionX;
+		}
+		
+		return targetCenterX;
 		
 	}
 

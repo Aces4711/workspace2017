@@ -2,16 +2,23 @@ package org.usfirst.frc.team4711.robot.commands;
 
 import org.usfirst.frc.team4711.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team4711.robot.subsystems.RobotEyeSubsystem;
+import org.usfirst.frc.team4711.robot.subsystems.RobotEyeSubsystem.Target;
 
 import edu.wpi.first.wpilibj.command.Command;
 
 public class AimForTarget extends Command {
 	
+	private boolean cw;
+	private Target target;
+	
 	private RobotEyeSubsystem robotEyeSubsystem;
 	private DriveSubsystem driveSubsystem;
 	
-	public AimForTarget(){
-		super("aimforTarget");
+	public AimForTarget(Target target, boolean cw){
+		super("aimForGearTarget");
+		
+		this.cw = cw;
+		this.target = target;
 		
 		robotEyeSubsystem = RobotEyeSubsystem.getInstance();
 		requires(robotEyeSubsystem);
@@ -19,27 +26,41 @@ public class AimForTarget extends Command {
 		driveSubsystem = DriveSubsystem.getInstance();
 		requires(driveSubsystem);
 		
-		//setTimeout(10);
+		setTimeout(5);
 	}
 	
 	@Override
 	protected void initialize() {
-		robotEyeSubsystem.startVisionBack();
+		switch(target){
+		case GEAR:
+			robotEyeSubsystem.startVisionBack();
+			break;
+		case BASKET:
+			robotEyeSubsystem.startVisionFront();
+			break;
+		}
 	}
 	
 	@Override
 	protected void execute() {
-		driveSubsystem.arcadeDrive(0, robotEyeSubsystem.getTargetCenterX());
+		driveSubsystem.turnOnAxis((cw)? 1.0 : -1.0);
 	}
 
 	@Override
 	protected boolean isFinished() {
-		return (-0.01 < robotEyeSubsystem.getTargetCenterX() && robotEyeSubsystem.getTargetCenterX() < 0.01 ) || isTimedOut();
+		return Math.abs(robotEyeSubsystem.getTargetCenterX()) <= .02 || isTimedOut();
 	}
 	
 	@Override
     protected void end() {
-		robotEyeSubsystem.endVisionBack();
+		switch(target){
+		case GEAR:
+			robotEyeSubsystem.endVisionBack();
+			break;
+		case BASKET:
+			robotEyeSubsystem.endVisionFront();
+			break;
+		}
 		driveSubsystem.stop();
     }
 	
