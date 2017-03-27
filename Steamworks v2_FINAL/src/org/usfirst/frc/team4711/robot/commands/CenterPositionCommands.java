@@ -1,7 +1,5 @@
 package org.usfirst.frc.team4711.robot.commands;
 
-import org.usfirst.frc.team4711.robot.subsystems.RobotEyeSubsystem;
-
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 
