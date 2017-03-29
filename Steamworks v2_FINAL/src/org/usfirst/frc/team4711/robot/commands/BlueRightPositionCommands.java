@@ -5,9 +5,9 @@ import org.usfirst.frc.team4711.robot.subsystems.RobotEyeSubsystem;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 
-public class RightPositionCommands extends CommandGroup {
+public class BlueRightPositionCommands extends CommandGroup {
 
-	public RightPositionCommands(){
+	public BlueRightPositionCommands(){
 		addSequential(new DriveFor(-75.0));
 		addSequential(new AimForTarget(RobotEyeSubsystem.Target.GEAR, false));
 		addSequential(new SquareUpToGearTarget());

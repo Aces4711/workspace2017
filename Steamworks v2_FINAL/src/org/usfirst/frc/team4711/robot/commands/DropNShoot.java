@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.command.WaitCommand;
 public class DropNShoot extends CommandGroup {
 	public DropNShoot() {
 		addSequential(new RunCenterOrSidePositions( new CenterPositionCommands(), 
-													new RunLeftOrRightPositions(new LeftPositionCommands(), 
-																				new RightPositionCommands())));
+													new RunLeftOrRightPositions(new RedLeftPositionCommands(), 
+																				new BlueRightPositionCommands())));
 	}
 }
